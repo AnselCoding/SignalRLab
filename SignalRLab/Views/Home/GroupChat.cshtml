@@ -1,0 +1,77 @@
+﻿@{
+    ViewData["Title"] = "GroupChat";
+}
+<h1>@ViewData["Title"]</h1>
+
+<div class="row">
+    <div class="col-8">
+        <div class="mb-3">
+            <label for="userId" class="form-label">個人 ID</label>
+            <input type="text" class="form-control" id="userId">
+            <label for="groupName" class="form-label">加入群組</label>
+            <input type="text" class="form-control" id="groupName">
+        </div>
+        <button type="button" class="btn btn-primary" id="btnConn">連線</button>
+        <hr />
+        <div class="mb-3">
+            <label for="message" class="form-label">發送訊息</label>
+            <input type="text" class="form-control" id="message">
+        </div>
+        <button type="button" class="btn btn-primary" id="btnSend">傳送訊息</button>
+    </div>
+    <div class="col-4">
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-12">
+        <h3>聊天內容</h3>
+        <ul class="list-group" id="content">
+        </ul>
+    </div>
+</div>
+
+
+@section scripts{
+    <script src="~/js/signalr/dist/browser/signalr.js"></script>
+    <script>
+        var connection;
+
+        //連線
+        $('#btnConn').on('click', () => {
+            connection = new signalR.HubConnectionBuilder().withUrl(`/yourHubPath?userId=${userId.value}`).build();
+
+            // 設置處理程序
+            // 在此處處理接收到的訊息，例如顯示在聊天視窗中
+            connection.on("ReceiveGroupMessage", (user, message) => {
+                $("#content").append($("<li></li>").attr("class", "list-group-item").text(`${user}: ${message}`));
+            });
+
+            //與Server建立連線
+            connection.start().then(() => {
+                console.log("Hub 連線完成");
+                // 加入 Group
+                connection.invoke("AddToGroup", groupName.value)
+                    .catch((err) => {
+                        alert('傳送錯誤: ' + err.toString());
+                    });
+            }).catch((err) => {
+                alert('連線錯誤: ' + err.toString());
+            });
+
+            // 連線後不可異動
+            $('#userId').attr('disabled', 'disabled');
+            $('#groupName').attr('disabled', 'disabled');
+            $('#btnConn').attr('disabled', 'disabled');            
+        });
+
+        //傳送訊息
+        $('#btnSend').on('click', () => {
+            connection.invoke("SendToGroup", groupName.value, userId.value, message.value)
+                .catch((err) => {
+                    alert('傳送錯誤: ' + err.toString());
+                });
+        });
+    </script>
+
+}

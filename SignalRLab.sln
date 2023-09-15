@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34024.191
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalRLab", "SignalRLab\SignalRLab.csproj", "{8FCF1F34-039B-42F4-9653-0A1601EDB5EE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8FCF1F34-039B-42F4-9653-0A1601EDB5EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8FCF1F34-039B-42F4-9653-0A1601EDB5EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8FCF1F34-039B-42F4-9653-0A1601EDB5EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8FCF1F34-039B-42F4-9653-0A1601EDB5EE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C5F12900-0B50-44C9-839D-62D047D53044}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,76 @@
+﻿@{
+    ViewData["Title"] = "Podcast";
+}
+
+@* <div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+ *@
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="row">
+    <div class="col-8">
+        <h4>個人 ID: </h4>
+        <input id="userId" type="text">
+        <button type="button" class="btn btn-primary" id="btnConn">連線</button>
+        <hr />
+        <div class="mb-3">
+            <label for="message" class="form-label">發送訊息</label>
+            <input type="text" class="form-control" id="message">
+        </div>
+        <button type="button" class="btn btn-primary" id="btnSend">傳送訊息</button>
+    </div>
+    <div class="col-4">
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-12">
+        <h3>聊天內容</h3>
+        <ul class="list-group" id="content">
+        </ul>
+    </div>
+</div>
+
+
+@section scripts{
+    <script src="~/js/signalr/dist/browser/signalr.js"></script>
+    <script>
+
+        var connection;
+        //連線
+        $('#btnConn').on('click', function () {
+            connection = new signalR.HubConnectionBuilder().withUrl(`/yourHubPath?userId=${userId.value}`).build();
+
+            // 設置處理程序
+            // 在此處處理接收到的訊息，例如顯示在聊天視窗中
+            connection.on("ReceivePodcast", (user, message) => {
+                $("#content").append($("<li></li>").attr("class", "list-group-item").text(`${user}: ${message}`));
+            });
+
+            //與Server建立連線
+            connection.start().then(function () {
+                console.log("Hub 連線完成");
+            }).catch(function (err) {
+                alert('連線錯誤: ' + err.toString());
+            });
+
+            // 連線後不可異動
+            $('#userId').attr('disabled', 'disabled');
+            $('#btnConn').attr('disabled', 'disabled');
+        });
+
+        //傳送訊息
+        $('#btnSend').on('click', function () {
+            let userId = $('#userId').val();
+            let message = $('#message').val();
+            connection.invoke("SendMessageToAll", userId, message)
+            .catch(function (err) {
+                alert('傳送錯誤: ' + err.toString());
+            });
+        });
+    </script>
+    
+}
