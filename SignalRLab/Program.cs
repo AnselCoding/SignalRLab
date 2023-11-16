@@ -19,6 +19,9 @@ builder.Services.AddControllersWithViews(options =>
 // Add Swagger
 builder.Services.AddSwaggerGen(options =>
 {
+    options.SwaggerDoc("controllers", new OpenApiInfo { Title = "SignalR Lab", Version = "v1", });
+    options.SwaggerDoc("hubs", new OpenApiInfo { Title = "SignalR Lab", Version = "v2", Description = "SignalR API 都有 JWT 驗證，只是此 SwaggerUI 沒有顯示鎖頭圖示。" });
+
     // 設置指定 XML 路徑，啟用API註解
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
@@ -36,10 +39,20 @@ builder.Services.AddSwaggerGen(options =>
         //認證放在http request的header上
         In = ParameterLocation.Header,
         //描述
-        Description = "JWT驗證描述"
+        Description = "JWT驗證"
     });
     //製作額外的過濾器，過濾Authorize、AllowAnonymous，甚至是沒有打attribute
     options.OperationFilter<SwaggerAuthorizeOperationFilter>();
+
+    // 加入SignalRSwagger
+    options.AddSignalRSwaggerGen(ssgOptions =>
+    {
+        ssgOptions.HubPathFunc = name => name switch
+        {
+            nameof(FirstSignalRHub) => "/yourHubPath",
+            _ => string.Empty
+        };
+    });
 });
 
 var config = builder.Configuration;
@@ -60,6 +73,24 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(config["JWT:Key"]))
         };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                // SignalR 會將 Token 以參數名稱 access_token 的方式放在 URL 查詢參數裡
+                // Read the token out of the query string
+                var accessToken = context.Request.Query["access_token"];
+
+                // 連線網址為 Hubs 相關路徑才檢查
+                var path = context.HttpContext.Request.Path;
+                if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/yourHubPath"))
+                {
+                    context.Token = accessToken;
+                }
+                return Task.CompletedTask;
+            }
+        };
     });
 
 // Add SignalR service
@@ -77,7 +108,11 @@ if (!app.Environment.IsDevelopment())
 else
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/controllers/swagger.json", "RESTful");
+        options.SwaggerEndpoint("/swagger/hubs/swagger.json", "SignalR");
+    });
 }
 
 app.UseHttpsRedirection();
@@ -88,7 +123,12 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapHub<FirstSignalRHub>("/yourHubPath");
+app.MapHub<FirstSignalRHub>("/yourHubPath", options =>
+{
+    // 驗證權杖到期時關閉連線
+    options.CloseOnAuthenticationExpiration = true;
+}
+    );
 
 app.MapControllerRoute(
     name: "default",

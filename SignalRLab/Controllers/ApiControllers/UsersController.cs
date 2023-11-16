@@ -5,6 +5,7 @@ using System.Security.Claims;
 
 namespace SignalRLab.Controllers.ApiControllers
 {
+    [ApiExplorerSettings(GroupName = "controllers")]
     [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
@@ -16,7 +17,8 @@ namespace SignalRLab.Controllers.ApiControllers
         public ActionResult AdminCheck()
         {
             // 取 ClaimsPrincipal 使用者資料
-            var name = User.FindFirstValue(ClaimTypes.Name);
+            //var name = User.FindFirstValue(ClaimTypes.Name);//取不到
+            var name = User.FindFirstValue("name");
             return Ok(name);
         }
 

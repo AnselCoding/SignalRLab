@@ -12,6 +12,10 @@
 
 <div class="row">
     <div class="col-8">
+        <h4>權杖Token: </h4>
+        <input id="loginToken" type="text">
+        <button type="button" class="btn btn-primary" id="btnGetToken">取得權杖Token</button>
+
         <h4>個人 ID: </h4>
         <input id="userId" type="text">
         <button type="button" class="btn btn-primary" id="btnConn">連線</button>
@@ -40,9 +44,24 @@
     <script>
 
         var connection;
+        var loginToken = 
+        //取得權杖Token
+            $('#btnGetToken').on('click', function () {
+                loginToken = $('#loginToken').val();
+
+                // 連線後不可異動
+                $('#loginToken').attr('disabled', 'disabled');
+                $('#btnGetToken').attr('disabled', 'disabled');
+            })
+
         //連線
         $('#btnConn').on('click', function () {
-            connection = new signalR.HubConnectionBuilder().withUrl(`/yourHubPath?userId=${userId.value}`).build();
+            // basic
+            // connection = new signalR.HubConnectionBuilder().withUrl(`/yourHubPath?userId=${userId.value}`).build();
+            // 提供驗證權杖
+            connection = new signalR.HubConnectionBuilder()
+                    .withUrl(`/yourHubPath?userId=${userId.value}`, { accessTokenFactory: () => loginToken })
+                    .build();
 
             // 設置處理程序
             // 在此處處理接收到的訊息，例如顯示在聊天視窗中
@@ -53,13 +72,14 @@
             //與Server建立連線
             connection.start().then(function () {
                 console.log("Hub 連線完成");
+
+                // 連線後不可異動
+                $('#userId').attr('disabled', 'disabled');
+                $('#btnConn').attr('disabled', 'disabled');
             }).catch(function (err) {
                 alert('連線錯誤: ' + err.toString());
             });
 
-            // 連線後不可異動
-            $('#userId').attr('disabled', 'disabled');
-            $('#btnConn').attr('disabled', 'disabled');
         });
 
         //傳送訊息
