@@ -9,7 +9,9 @@ using System.Security.Claims;
 namespace SignalRLab.Hubs
 {
     [SignalRHub(autoDiscover: AutoDiscover.MethodsAndParams, documentNames: new[] { "hubs" })]
-    [Authorize]
+    //[Authorize]
+    [Authorize(Policy = "PolicyForPath2")]
+    //[Authorize(Policy = "PolicyForPath1")]
     public class FirstSignalRHub : Hub
     {
         // 存放自訂義 userId 與 ConnectionId 的配對
@@ -22,6 +24,7 @@ namespace SignalRLab.Hubs
         public override async Task OnConnectedAsync()
         {
             // 從 request 的 query string 獲取前端的傳來的 userId
+            // (如果沒有加入驗證，的使用者資料取法，加入驗證就能從token中取得使用者資料)
             var userId = Context.GetHttpContext().Request.Query["userId"].ToString();
 
             // 取 JWT token 中的 Claim info
@@ -31,7 +34,7 @@ namespace SignalRLab.Hubs
             userConnections[userId] = Context.ConnectionId;
 
             // 更新聊天內容，通知新連線
-            await Clients.All.SendAsync("ReceivePodcast", "新連線 ID "+name+"有嗎", userId);
+            await Clients.All.SendAsync("ReceivePodcast", $"取得JWT資料(name:{name}), 新連線 ID", userId);
 
             await base.OnConnectedAsync();
         }

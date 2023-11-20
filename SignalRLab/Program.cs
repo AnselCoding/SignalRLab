@@ -44,7 +44,7 @@ builder.Services.AddSwaggerGen(options =>
     //製作額外的過濾器，過濾Authorize、AllowAnonymous，甚至是沒有打attribute
     options.OperationFilter<SwaggerAuthorizeOperationFilter>();
 
-    // 加入SignalRSwagger
+    // 加入SignalRSwagger，能增加 SignalR 事件 API 顯示，但不能在 Swagger 進行操作
     options.AddSignalRSwaggerGen(ssgOptions =>
     {
         ssgOptions.HubPathFunc = name => name switch
@@ -57,8 +57,9 @@ builder.Services.AddSwaggerGen(options =>
 
 var config = builder.Configuration;
 // Add Jwt Authentication
+// Use Multiple AddAuthentication and Authorization
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+    .AddJwtBearer("Path1Scheme", options =>
     {
         options.SaveToken = true;
         // Issuer and Audience shall be true for production, also GetPrincipalFromExpiredToken() and IsRefreshTokenValidate(). Put Issuer and Audience into SecurityTokenDescriptor at GenerateToken().
@@ -74,6 +75,40 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 Encoding.UTF8.GetBytes(config["JWT:Key"]))
         };
 
+        // SignalR add Authorization
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                // SignalR 會將 Token 以參數名稱 access_token 的方式放在 URL 查詢參數裡
+                // Read the token out of the query string
+                var accessToken = context.Request.Query["access_token"];
+
+                // 連線網址為 Hubs 相關路徑才檢查
+                var path = context.HttpContext.Request.Path;
+                if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/yourHubPath"))
+                {
+                    context.Token = accessToken;
+                }
+                return Task.CompletedTask;
+            }
+        };
+    })
+    .AddJwtBearer("Path2Scheme", options =>
+    {
+        options.SaveToken = true;
+        // Issuer and Audience shall be true for production, also GetPrincipalFromExpiredToken() and IsRefreshTokenValidate(). Put Issuer and Audience into SecurityTokenDescriptor at GenerateToken().
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(config["JWT:Key"]))
+        };
+
+        // SignalR add Authorization
         options.Events = new JwtBearerEvents
         {
             OnMessageReceived = context =>
@@ -92,6 +127,21 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             }
         };
     });
+
+// Use Multiple AddAuthentication and Authorization
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("PolicyForPath1", policy =>
+    {
+        policy.AuthenticationSchemes.Add("Path1Scheme");
+        policy.RequireAuthenticatedUser(); // 使用者必須已驗證
+    });
+    options.AddPolicy("PolicyForPath2", policy =>
+    {
+        policy.AuthenticationSchemes.Add("Path2Scheme");
+        policy.RequireAuthenticatedUser(); // 使用者必須已驗證
+    });
+});
 
 // Add SignalR service
 builder.Services.AddSignalR();
@@ -127,8 +177,7 @@ app.MapHub<FirstSignalRHub>("/yourHubPath", options =>
 {
     // 驗證權杖到期時關閉連線
     options.CloseOnAuthenticationExpiration = true;
-}
-    );
+});
 
 app.MapControllerRoute(
     name: "default",
