@@ -5,7 +5,7 @@ using System.Security.Claims;
 
 namespace SignalRLab.Controllers.ApiControllers
 {
-    [ApiExplorerSettings(GroupName = "controllers")]
+    [ApiExplorerSettings(GroupName = "controllers")] //顯示於 Swagger 指定分頁中
     [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]

@@ -7,10 +7,10 @@
 
 <div class="row">
     <div class="col-8">
-        <div class="mb-3">
+       @*  <div class="mb-3">
             <label for="userId" class="form-label">個人 ID</label>
             <input type="text" class="form-control" id="userId">
-        </div>
+        </div> *@
         <button type="button" class="btn btn-primary" id="btnConn">連線</button>
         <hr />
         <div class="mb-3">
@@ -43,7 +43,11 @@
 
         //連線
         $('#btnConn').on('click', () => {
-            connection = new signalR.HubConnectionBuilder().withUrl(`/yourHubPath?userId=${userId.value}`).build();
+            // basic
+            // connection = new signalR.HubConnectionBuilder().withUrl(`/HubPathFirst?userId=${userId.value}`).build();
+            // 提供驗證權杖
+            connection = new signalR.HubConnectionBuilder().withUrl(`/HubPathPerson`, { accessTokenFactory: () => localStorage.getItem("loginToken") })
+                .build();
 
             // 設置處理程序
             // 在此處處理接收到的訊息，例如顯示在聊天視窗中
@@ -65,7 +69,7 @@
 
         //傳送訊息
         $('#btnSend').on('click', () => {
-            connection.invoke("SendToUser", sendToId.value, userId.value, message.value)
+            connection.invoke("SendToUser", sendToId.value, message.value)
                 .catch((err) => {
                     alert('傳送錯誤: ' + err.toString());
                 });

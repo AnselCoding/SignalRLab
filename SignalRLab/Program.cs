@@ -49,8 +49,11 @@ builder.Services.AddSwaggerGen(options =>
     {
         ssgOptions.HubPathFunc = name => name switch
         {
-            nameof(FirstSignalRHub) => "/yourHubPath",
-            _ => string.Empty
+            nameof(FirstSignalRHub) => "/HubPathFirst",
+            nameof(AllHub) => "/HubPathAll",
+            nameof(GroupHub) => "/HubPathGroup",
+            nameof(PersonHub) => "/HubPathPerson",
+            _ => string.Empty,
         };
     });
 });
@@ -86,7 +89,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
                 // 連線網址為 Hubs 相關路徑才檢查
                 var path = context.HttpContext.Request.Path;
-                if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/yourHubPath"))
+                if (!string.IsNullOrEmpty(accessToken) && (
+                    path.StartsWithSegments("/HubPathFirst") ||
+                    path.StartsWithSegments("/HubPathAll") ||
+                    path.StartsWithSegments("/HubPathGroup") ||
+                    path.StartsWithSegments("/HubPathPerson")
+                ))
                 {
                     context.Token = accessToken;
                 }
@@ -119,7 +127,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
                 // 連線網址為 Hubs 相關路徑才檢查
                 var path = context.HttpContext.Request.Path;
-                if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/yourHubPath"))
+                if (!string.IsNullOrEmpty(accessToken) && ( 
+                    path.StartsWithSegments("/HubPathFirst") ||
+                    path.StartsWithSegments("/HubPathAll") ||
+                    path.StartsWithSegments("/HubPathGroup") ||
+                    path.StartsWithSegments("/HubPathPerson")
+                ))
                 {
                     context.Token = accessToken;
                 }
@@ -173,7 +186,24 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapHub<FirstSignalRHub>("/yourHubPath", options =>
+// Use multiple SignalR hub
+app.MapHub<FirstSignalRHub>("/HubPathFirst", options =>
+{
+    // 驗證權杖到期時關閉連線
+    options.CloseOnAuthenticationExpiration = true;
+});
+
+app.MapHub<AllHub>("/HubPathAll", options =>
+{
+    // 驗證權杖到期時關閉連線
+    options.CloseOnAuthenticationExpiration = true;
+});
+app.MapHub<GroupHub>("/HubPathGroup", options =>
+{
+    // 驗證權杖到期時關閉連線
+    options.CloseOnAuthenticationExpiration = true;
+});
+app.MapHub<PersonHub>("/HubPathPerson", options =>
 {
     // 驗證權杖到期時關閉連線
     options.CloseOnAuthenticationExpiration = true;

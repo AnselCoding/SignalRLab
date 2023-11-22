@@ -16,8 +16,8 @@
         <input id="loginToken" type="text">
         <button type="button" class="btn btn-primary" id="btnGetToken">取得權杖Token</button>
 
-        <h4>個人 ID: </h4>
-        <input id="userId" type="text">
+        @* <h4>個人 ID: </h4>
+        <input id="userId" type="text"> *@
         <button type="button" class="btn btn-primary" id="btnConn">連線</button>
         <hr />
         <div class="mb-3">
@@ -44,23 +44,27 @@
     <script>
 
         var connection;
-        var loginToken = 
+        var loginToken = "";
         //取得權杖Token
-            $('#btnGetToken').on('click', function () {
-                loginToken = $('#loginToken').val();
+        $('#btnGetToken').on('click', function () {
+            loginToken = $('#loginToken').val();
+            localStorage.setItem("loginToken", $('#loginToken').val());
 
-                // 連線後不可異動
-                $('#loginToken').attr('disabled', 'disabled');
-                $('#btnGetToken').attr('disabled', 'disabled');
-            })
+            // 連線後不可異動
+            $('#loginToken').attr('disabled', 'disabled');
+            $('#btnGetToken').attr('disabled', 'disabled');
+        })
 
         //連線
         $('#btnConn').on('click', function () {
             // basic
-            // connection = new signalR.HubConnectionBuilder().withUrl(`/yourHubPath?userId=${userId.value}`).build();
+            // connection = new signalR.HubConnectionBuilder().withUrl(`/HubPathFisrt?userId=${userId.value}`).build();
             // 提供驗證權杖
+            // connection = new signalR.HubConnectionBuilder()
+            //     .withUrl(`/HubPathFirst?userId=${userId.value}`, { accessTokenFactory: () => localStorage.getItem("loginToken") })
+            //         .build();
             connection = new signalR.HubConnectionBuilder()
-                    .withUrl(`/yourHubPath?userId=${userId.value}`, { accessTokenFactory: () => loginToken })
+                .withUrl(`/HubPathAll`, { accessTokenFactory: () => localStorage.getItem("loginToken") })
                     .build();
 
             // 設置處理程序
@@ -86,7 +90,7 @@
         $('#btnSend').on('click', function () {
             let userId = $('#userId').val();
             let message = $('#message').val();
-            connection.invoke("SendMessageToAll", userId, message)
+            connection.invoke("SendMessageToAll", message)
             .catch(function (err) {
                 alert('傳送錯誤: ' + err.toString());
             });
