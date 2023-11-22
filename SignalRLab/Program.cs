@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SignalRLab.Hubs;
@@ -15,6 +16,9 @@ builder.Services.AddControllersWithViews(options =>
     // Apply ExceptionFilter globally.
     options.Filters.Add(typeof(CommonExceptionFilter));
 });
+
+// Add SignalR 使用者識別Id
+builder.Services.AddSingleton<IUserIdProvider, MyUserIdProvider>();
 
 // Add Swagger
 builder.Services.AddSwaggerGen(options =>

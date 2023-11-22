@@ -38,16 +38,21 @@ namespace SignalRLab.Hubs
         public async Task SendToUser(string sendToId, string message)
         {
             var toConnectionId = GetConnectionIdFromUserId(sendToId);
+            var sendFromId = Context.User.FindFirstValue("name");
 
             // 將離線時需要通知的人，加入群組
             await Groups.AddToGroupAsync(Context.ConnectionId, sendToId);
-            await Groups.AddToGroupAsync(toConnectionId, Context.User.FindFirstValue("name"));
+            await Groups.AddToGroupAsync(toConnectionId, sendFromId);
 
 
             // 接收人
-            await Clients.Client(toConnectionId).SendAsync("ReceiveMessage", Context.User.FindFirstValue("name"), message);
+            //await Clients.Client(toConnectionId).SendAsync("ReceiveMessage", sendFromId, message);
+            // 該用戶所有登入裝置連線
+            await Clients.User(sendToId).SendAsync("ReceiveMessage", sendFromId, message);
             // 發送人
-            await Clients.Caller.SendAsync("ReceiveMessage", Context.User.FindFirstValue("name"), message);
+            //await Clients.Caller.SendAsync("ReceiveMessage", sendFromId, message);
+            // 該用戶所有登入裝置連線
+            await Clients.User(sendFromId).SendAsync("ReceiveMessage", sendFromId, message);
         }
     }
 }
