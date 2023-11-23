@@ -23,7 +23,7 @@ namespace SignalRLab.Hubs
         {
             // 更新聊天內容，通知離線
             // 獲取使用者 ID
-            var sendFromId = Context.User.FindFirstValue("name");
+            var sendFromId = UserId;
 
             if (!string.IsNullOrEmpty(sendFromId))
             {
@@ -44,14 +44,14 @@ namespace SignalRLab.Hubs
 
         public async Task AddToGroup(string groupName)
         {
-            var sendFromId = Context.User.FindFirstValue("name");
+            var sendFromId = UserId;
             _userGroups[sendFromId] = new List<string>() { groupName };
             await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
         }
 
         public async Task SendToGroup(string groupName, string message)
         {
-            await Clients.Group(groupName).SendAsync("ReceiveGroupMessage", Context.User.FindFirstValue("name"), message);
+            await Clients.Group(groupName).SendAsync("ReceiveGroupMessage", UserId, message);
         }
     }
 }

@@ -21,7 +21,7 @@ namespace SignalRLab.Hubs
         {
             // 更新聊天內容，通知離線
             // 獲取使用者 ID
-            var sendFromId = Context.User.FindFirstValue("name");
+            var sendFromId = UserId;
 
             if (!string.IsNullOrEmpty(sendFromId))
             {
@@ -38,7 +38,7 @@ namespace SignalRLab.Hubs
         public async Task SendToUser(string sendToId, string message)
         {
             var toConnectionId = GetConnectionIdFromUserId(sendToId);
-            var sendFromId = Context.User.FindFirstValue("name");
+            var sendFromId = UserId;
 
             // 將離線時需要通知的人，加入群組
             await Groups.AddToGroupAsync(Context.ConnectionId, sendToId);

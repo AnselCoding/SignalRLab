@@ -17,11 +17,11 @@ namespace SignalRLab.Hubs
         public override async Task OnConnectedAsync()
         {
             // 取 JWT token 中的 Claim info
-            var userId = Context.User.FindFirstValue("name");
+            var userId = UserId;
 
             // 更新聊天內容，通知新連線
             await Clients.All.SendAsync("ReceivePodcast", "新連線 ID", userId);
-
+            
             await base.OnConnectedAsync();
         }
 
@@ -42,7 +42,7 @@ namespace SignalRLab.Hubs
         public async Task SendMessageToAll( string message)
         {
             // 將訊息傳送給所有連接的客戶端
-            await Clients.All.SendAsync("ReceivePodcast", Context.User.FindFirstValue("name"), message);
+            await Clients.All.SendAsync("ReceivePodcast", UserId, message);
         }
     }
 }
