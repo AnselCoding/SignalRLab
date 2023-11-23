@@ -27,8 +27,4 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.33.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="SignalRTimer\" />
-  </ItemGroup>
-
 </Project>

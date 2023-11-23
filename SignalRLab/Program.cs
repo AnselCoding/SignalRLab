@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SignalRLab.Hubs;
 using SignalRLab.Middleware;
+using SignalRLab.SignalRTimer;
 using System.Reflection;
 using System.Text;
 
@@ -19,6 +21,12 @@ builder.Services.AddControllersWithViews(options =>
 
 // Add SignalR 使用者識別Id
 builder.Services.AddSingleton<IUserIdProvider, MyUserIdProvider>();
+// 將 DisconnectTimer (IHostedService) 實現註冊為 Hosted Service
+builder.Services.AddHostedService<DisconnectTimer>();
+// Add DisconnectTimer service
+builder.Services.AddScoped<DisconnectTimer>();
+// 讓自訂元件存取 HttpContext
+builder.Services.AddHttpContextAccessor();
 
 // Add Swagger
 builder.Services.AddSwaggerGen(options =>
