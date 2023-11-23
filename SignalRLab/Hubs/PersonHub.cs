@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.SignalR;
 using SignalRSwaggerGen.Attributes;
 using SignalRSwaggerGen.Enums;
-using System.Security.Claims;
 
 namespace SignalRLab.Hubs
 {
