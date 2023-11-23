@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
-using SignalRLab.SignalRTimer;
 using SignalRSwaggerGen.Attributes;
 using SignalRSwaggerGen.Enums;
 using System.Collections.Concurrent;
