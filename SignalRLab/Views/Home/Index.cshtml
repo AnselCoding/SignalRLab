@@ -84,6 +84,16 @@
                 alert('連線錯誤: ' + err.toString());
             });
 
+            // 自訂Server要關閉連線事件
+            connection.on("Disconnect", function () {
+                connection.stop();
+            });
+
+            // 關閉連線
+            connection.onclose(function (e) {
+                console.log("Server canceled connection.");
+            })
+
         });
 
         //傳送訊息

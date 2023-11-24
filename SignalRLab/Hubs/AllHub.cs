@@ -55,7 +55,7 @@ namespace SignalRLab.Hubs
             _disconnectTimer.Restart();
 
             // 將訊息傳送給所有連接的客戶端
-            await Clients.All.SendAsync("ReceivePodcast", UserId, message);
+            await Clients.All.SendAsync("ReceivePodcast", UserId, message);            
         }
     }
 }

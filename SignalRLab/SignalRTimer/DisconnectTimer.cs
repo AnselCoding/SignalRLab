@@ -15,7 +15,6 @@ namespace SignalRLab.SignalRTimer
         private readonly IConfiguration _configuration;
         private readonly int NotifyMin;
         private readonly int ConnectionExpireMin;
-        private Timer _aTimer;
         private static readonly ConcurrentDictionary<string, System.Timers.Timer> _userTimers = new ConcurrentDictionary<string, System.Timers.Timer>();
         private string _userId;
 
@@ -92,7 +91,8 @@ namespace SignalRLab.SignalRTimer
         private void DoActionB()
         {
             _logger.LogInformation("Doing Action B...");
-            _hubContext.Clients.All.SendAsync("ReceivePodcast", _userId, "Doing Action B...").Wait();
+            // SignalR的設計，需要從前端才能正常斷開連線
+            _hubContext.Clients.User(_userId).SendAsync("Disconnect").Wait();
 
             Stop();
         }
