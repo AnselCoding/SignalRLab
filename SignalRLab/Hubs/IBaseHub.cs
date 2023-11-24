@@ -17,5 +17,8 @@ namespace SignalRLab.Hubs
 
         [SignalRMethod(summary: "接聽Server中斷連線事件", autoDiscover: AutoDiscover.Params)]
         Task OnDisconnect();
+
+        [SignalRMethod(summary: "接收物件訊息事件", autoDiscover: AutoDiscover.Params)]
+        Task OnReceiveObj(dynamic arg1);
     }
 }

@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.SignalR;
 using SignalRLab.SignalRTimer;
 using SignalRSwaggerGen.Attributes;
 using SignalRSwaggerGen.Enums;
+using System.Runtime.CompilerServices;
 
 namespace SignalRLab.Hubs
 {
@@ -52,12 +52,20 @@ namespace SignalRLab.Hubs
         }
 
         [SignalRMethod(summary: "廣播發送訊息", description: "對應接收事件 OnReceivePodcast。", autoDiscover: AutoDiscover.Params)]
-        public async Task SendMessageToAll( string message)
+        public async Task SendMessageToAll(string message)
         {
             _disconnectTimer.Restart();
 
             // 將訊息傳送給所有連接的客戶端
             await Clients.All.OnReceivePodcast(UserId, message);            
+        }
+
+        public async Task SendObj(DynamicAttribute msgObj)
+        {
+            // 匿名函式 OK
+            //await Clients.Caller.OnReceiveObj(new {name=$"{UserId}", age=42 });
+            
+            await Clients.Caller.OnReceiveObj(msgObj);
         }
     }
 }

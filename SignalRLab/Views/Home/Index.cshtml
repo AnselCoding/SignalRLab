@@ -25,6 +25,7 @@
             <input type="text" class="form-control" id="message">
         </div>
         <button type="button" class="btn btn-primary" id="btnSend">傳送訊息</button>
+        <button type="button" class="btn btn-primary" id="btnSendObj">測試傳送物件訊息</button>
     </div>
     <div class="col-4">
     </div>
@@ -94,6 +95,10 @@
                 console.log("Server canceled connection.");
             })
 
+            // 測試接收物件
+            connection.on("OnReceiveObj", (msgObj) => {
+                console.log(msgObj);
+            });
         });
 
         //傳送訊息
@@ -104,6 +109,20 @@
             .catch(function (err) {
                 alert('傳送錯誤: ' + err.toString());
             });
+        });
+
+        //測試傳送物件
+        $('#btnSendObj').on('click', function () {
+            let msgObj = {
+                "action": "a1",
+                "fromMemberId": "a2",
+                "toMemberId": "a3",
+                "timestamp": "a4"
+            }
+            connection.invoke("SendObj", msgObj)
+                .catch(function (err) {
+                    alert('傳送錯誤: ' + err.toString());
+                });
         });
     </script>
     

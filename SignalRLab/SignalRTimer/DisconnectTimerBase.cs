@@ -55,13 +55,14 @@ namespace SignalRLab.SignalRTimer
         protected void StartTimer(int minute, Action action)
         {
             // 檢查是否已經存在計時器
-            if (_userTimers.TryAdd(_userId, new System.Timers.Timer(minute * 1000)))
+            if (_userTimers.TryAdd(_userId, new System.Timers.Timer(minute * 1000 * 60)))
             {
                 var timer = _userTimers[_userId];
                 timer.Elapsed += (sender, args) => action();
                 timer.Start();
             }
         }
+
         protected virtual void DoActionA() { }
 
         protected virtual void DoActionB() { }
