@@ -20,8 +20,8 @@ builder.Services.AddControllersWithViews(options =>
 
 // Add SignalR 使用者識別Id
 builder.Services.AddSingleton<IUserIdProvider, MyUserIdProvider>();
-// Add DisconnectTimer service 註冊 為 Scoped 服務
-builder.Services.AddScoped<IDisconnectTimer,DisconnectTimer>();
+// Add AllHubDisconnectTimer service 註冊 為 Scoped 服務
+builder.Services.AddScoped<IDisconnectTimer,AllHubDisconnectTimer>();
 // 讓自訂元件存取 HttpContext
 builder.Services.AddHttpContextAccessor();
 
