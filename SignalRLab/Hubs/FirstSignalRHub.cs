@@ -8,7 +8,7 @@ using System.Security.Claims;
 
 namespace SignalRLab.Hubs
 {
-    [SignalRHub(autoDiscover: AutoDiscover.MethodsAndParams, documentNames: new[] { "hubs" })]
+    //[SignalRHub(autoDiscover: AutoDiscover.MethodsAndParams, documentNames: new[] { "hubs" })]
     //[Authorize]
     [Authorize(Policy = "PolicyForPath2")]
     //[Authorize(Policy = "PolicyForPath1")]

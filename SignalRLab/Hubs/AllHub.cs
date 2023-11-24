@@ -20,13 +20,14 @@ namespace SignalRLab.Hubs
         /// 連線事件
         /// </summary>
         /// <returns></returns>
+        [SignalRHidden]
         public override async Task OnConnectedAsync()
         {
             // 取 JWT token 中的 Claim info
             var userId = UserId;
 
             // 更新聊天內容，通知新連線
-            await Clients.All.SendAsync("ReceivePodcast", "新連線 ID", userId);
+            await Clients.All.OnReceivePodcast("新連線 ID", userId);
 
             _disconnectTimer.Start();
 
@@ -45,17 +46,18 @@ namespace SignalRLab.Hubs
             _disconnectTimer.Stop();
 
             // 更新聊天內容，通知離線
-            await Clients.All.SendAsync("ReceivePodcast", "已離線 ID", base.GetUserIdFromConnectionId(Context.ConnectionId));
+            await Clients.All.OnReceivePodcast("已離線 ID", base.GetUserIdFromConnectionId(Context.ConnectionId));
 
             await base.OnDisconnectedAsync(exception);
         }
 
+        [SignalRMethod(summary: "廣播發送訊息", description: "對應接收事件 OnReceivePodcast。", autoDiscover: AutoDiscover.Params)]
         public async Task SendMessageToAll( string message)
         {
             _disconnectTimer.Restart();
 
             // 將訊息傳送給所有連接的客戶端
-            await Clients.All.SendAsync("ReceivePodcast", UserId, message);            
+            await Clients.All.OnReceivePodcast(UserId, message);            
         }
     }
 }

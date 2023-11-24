@@ -25,7 +25,7 @@ namespace SignalRLab.Hubs
             if (!string.IsNullOrEmpty(sendFromId))
             {
                 // 更新聊天內容，通知離線
-                await Clients.OthersInGroup(sendFromId).SendAsync("ReceiveMessage", $"{sendFromId}", "已離線");
+                await Clients.OthersInGroup(sendFromId).OnReceiveMessage($"{sendFromId}", "已離線");
 
                 // 從组中移除用户
                 // 無法取得群組中的ConnectionId
@@ -34,6 +34,8 @@ namespace SignalRLab.Hubs
 
             await base.OnDisconnectedAsync(exception);
         }
+
+        [SignalRMethod(summary: "對個人帳號發送訊息", description: "對應接收事件 OnReceiveMessage，記錄配對，後續進行離線通知。", autoDiscover: AutoDiscover.Params)]
         public async Task SendToUser(string sendToId, string message)
         {
             var toConnectionId = GetConnectionIdFromUserId(sendToId);
@@ -47,11 +49,11 @@ namespace SignalRLab.Hubs
             // 接收人
             //await Clients.Client(toConnectionId).SendAsync("ReceiveMessage", sendFromId, message);
             // 該用戶所有登入裝置連線
-            await Clients.User(sendToId).SendAsync("ReceiveMessage", sendFromId, message);
+            await Clients.User(sendToId).OnReceiveMessage(sendFromId, message);
             // 發送人
             //await Clients.Caller.SendAsync("ReceiveMessage", sendFromId, message);
             // 該用戶所有登入裝置連線
-            await Clients.User(sendFromId).SendAsync("ReceiveMessage", sendFromId, message);
+            await Clients.User(sendFromId).OnReceiveMessage(sendFromId, message);
         }
     }
 }

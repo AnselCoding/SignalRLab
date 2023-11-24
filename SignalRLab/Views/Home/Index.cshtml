@@ -69,7 +69,7 @@
 
             // 設置處理程序
             // 在此處處理接收到的訊息，例如顯示在聊天視窗中
-            connection.on("ReceivePodcast", (user, message) => {
+            connection.on("OnReceivePodcast", (user, message) => {
                 $("#content").append($("<li></li>").attr("class", "list-group-item").text(`${user}: ${message}`));
             });
 
@@ -85,7 +85,7 @@
             });
 
             // 自訂Server要關閉連線事件
-            connection.on("Disconnect", function () {
+            connection.on("OnDisconnect", function () {
                 connection.stop();
             });
 

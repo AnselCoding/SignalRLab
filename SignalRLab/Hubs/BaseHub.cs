@@ -8,7 +8,7 @@ using System.Security.Claims;
 
 namespace SignalRLab.Hubs
 {
-    public class BaseHub : Hub
+    public class BaseHub : Hub<IBaseHub>
     {
         // 存放 JWT token userId 與 ConnectionId 的配對
         protected static readonly ConcurrentDictionary<string, string> userConnectionIds = new ConcurrentDictionary<string, string>();

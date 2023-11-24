@@ -11,7 +11,7 @@ namespace SignalRLab.SignalRTimer
     {
         private readonly ILogger<DisconnectTimer> _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IHubContext<AllHub> _hubContext;
+        private readonly IHubContext<AllHub, IBaseHub> _hubContext;
         private readonly IConfiguration _configuration;
         private readonly int NotifyMin;
         private readonly int ConnectionExpireMin;
@@ -19,7 +19,7 @@ namespace SignalRLab.SignalRTimer
         private string _userId;
 
 
-        public DisconnectTimer(ILogger<DisconnectTimer> logger, IHubContext<AllHub> hubContext, IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
+        public DisconnectTimer(ILogger<DisconnectTimer> logger, IHubContext<AllHub, IBaseHub> hubContext, IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
         {
             _logger = logger;
             _hubContext = hubContext;
@@ -33,7 +33,7 @@ namespace SignalRLab.SignalRTimer
             _userId = _httpContextAccessor.HttpContext.User.FindFirstValue("name");
 
             _logger.LogInformation($"Timer started for user {_userId}.");
-            //_hubContext.Clients.All.SendAsync("ReceivePodcast", _userId, "Timer started.").Wait();
+            //_hubContext.Clients.All.SendAsync("OnReceivePodcast", _userId, "Timer started.").Wait();
             StartTimer(NotifyMin, DoActionA);
         }
 
@@ -58,7 +58,7 @@ namespace SignalRLab.SignalRTimer
             Stop();
 
             _logger.LogInformation("Timer restarted.");
-            //_hubContext.Clients.All.SendAsync("ReceivePodcast", _userId, "Timer restarted.").Wait();
+            //_hubContext.Clients.All.SendAsync("OnReceivePodcast", _userId, "Timer restarted.").Wait();
             
             // 設定計時器，每5秒執行一次 DoActionA 方法
             Start();
@@ -82,7 +82,7 @@ namespace SignalRLab.SignalRTimer
             Stop();
 
             _logger.LogInformation("Doing Action A...");
-            _hubContext.Clients.All.SendAsync("ReceivePodcast", _userId, "Doing Action A...").Wait();
+            _hubContext.Clients.All.OnReceivePodcast(_userId, "Doing Action A...").Wait();
 
             // 設定計時器，每15秒執行一次 DoActionB 方法
             StartTimer(ConnectionExpireMin, DoActionB);
@@ -92,7 +92,7 @@ namespace SignalRLab.SignalRTimer
         {
             _logger.LogInformation("Doing Action B...");
             // SignalR的設計，需要從前端才能正常斷開連線
-            _hubContext.Clients.User(_userId).SendAsync("Disconnect").Wait();
+            _hubContext.Clients.User(_userId).OnDisconnect().Wait();
 
             Stop();
         }

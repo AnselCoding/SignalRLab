@@ -12,9 +12,9 @@ namespace SignalRLab.Controllers.ApiControllers
     [ApiController]
     public class CallHubController : ControllerBase
     {
-        private readonly IHubContext<AllHub> _hubContext;
+        private readonly IHubContext<AllHub, IBaseHub> _hubContext;
 
-        public CallHubController(IHubContext<AllHub> hubContext)
+        public CallHubController(IHubContext<AllHub, IBaseHub> hubContext)
         {
             _hubContext = hubContext;
         }
@@ -25,7 +25,7 @@ namespace SignalRLab.Controllers.ApiControllers
         {
             // 取 ClaimsPrincipal 使用者資料
             var userId = User.FindFirstValue("Id");
-            await _hubContext.Clients.All.SendAsync("ReceivePodcast", User.FindFirstValue("name"), message);
+            await _hubContext.Clients.All.OnReceivePodcast(User.FindFirstValue("name"), message);
             return Ok(userId);
         }
     }

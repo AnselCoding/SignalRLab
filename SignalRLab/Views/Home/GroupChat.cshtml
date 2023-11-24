@@ -47,7 +47,7 @@
 
             // 設置處理程序
             // 在此處處理接收到的訊息，例如顯示在聊天視窗中
-            connection.on("ReceiveGroupMessage", (user, message) => {
+            connection.on("OnReceiveGroupMessage", (user, message) => {
                 $("#content").append($("<li></li>").attr("class", "list-group-item").text(`${user}: ${message}`));
             });
 
