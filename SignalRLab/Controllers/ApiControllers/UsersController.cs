@@ -6,7 +6,8 @@ using System.Security.Claims;
 namespace SignalRLab.Controllers.ApiControllers
 {
     [ApiExplorerSettings(GroupName = "controllers")] //顯示於 Swagger 指定分頁中
-    [Authorize]
+    //[Authorize]
+    [Authorize(Policy = "PolicyForPath2")]
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class UsersController : ControllerBase
@@ -28,7 +29,7 @@ namespace SignalRLab.Controllers.ApiControllers
         {
             // 取 ClaimsPrincipal 使用者資料
             var userId = User.FindFirstValue("Id");
-            return Ok(userId);
+            return Ok(userId);            
         }
     }
 }

@@ -10,6 +10,13 @@ namespace SignalRLab.Hubs
     [Authorize(Policy = "PolicyForPath2")]
     public class PersonHub : BaseHub
     {
+        private readonly IHubContext<AllHub, IBaseHub> _hubContext;
+
+        public PersonHub(IHubContext<AllHub, IBaseHub> hubContext)
+        {
+            _hubContext = hubContext;
+        }
+
         /// <summary>
         /// 離線事件
         /// </summary>
@@ -54,6 +61,13 @@ namespace SignalRLab.Hubs
             //await Clients.Caller.SendAsync("ReceiveMessage", sendFromId, message);
             // 該用戶所有登入裝置連線
             await Clients.User(sendFromId).OnReceiveMessage(sendFromId, message);
+            
+        }
+
+        [SignalRMethod(summary: "測試Hub間通訊", description: "對應接收事件 OnReceivePodcast。", autoDiscover: AutoDiscover.Params)]
+        public async Task SendToBordcast()
+        {
+            await _hubContext.Clients.All.OnReceivePodcast(UserId, "跨 Hub 通訊測試");
         }
     }
 }

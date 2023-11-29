@@ -22,6 +22,7 @@
             <input type="text" class="form-control" id="sendToId">
         </div>
         <button type="button" class="btn btn-primary" id="btnSend">傳送訊息</button>
+        <button type="button" class="btn btn-primary" id="btnSendToBoardcast">傳送跨訊息到布告欄</button>
     </div>
     <div class="col-4">
     </div>
@@ -70,6 +71,14 @@
         //傳送訊息
         $('#btnSend').on('click', () => {
             connection.invoke("SendToUser", sendToId.value, message.value)
+                .catch((err) => {
+                    alert('傳送錯誤: ' + err.toString());
+                });
+        });
+
+        //傳送訊息
+        $('#btnSendToBoardcast').on('click', () => {
+            connection.invoke("SendToBordcast")
                 .catch((err) => {
                     alert('傳送錯誤: ' + err.toString());
                 });
