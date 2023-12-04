@@ -13,13 +13,14 @@ namespace SignalRLab.SignalRTimer
         protected ILogger<DisconnectTimerBase> _logger;
         protected int ConnectionExpireMin;
         protected int NotifyMin;
-        protected string _userId;
+        protected string _userId
+        {
+            get { return _httpContextAccessor.HttpContext.User.FindFirstValue("UserId"); }
+        }
 
 
         public void Restart()
         {
-            _userId = _httpContextAccessor.HttpContext.User.FindFirstValue("name");
-
             // 重新計算時間
             // 先停止原計時器
             Stop();
@@ -32,8 +33,6 @@ namespace SignalRLab.SignalRTimer
         }
         public void Start()
         {
-            _userId = _httpContextAccessor.HttpContext.User.FindFirstValue("name");
-
             _logger.LogInformation($"Timer started for user {_userId}.");
             //_hubContext.Clients.All.SendAsync("OnReceivePodcast", _userId, "Timer started.").Wait();
             StartTimer(NotifyMin, DoActionA);
@@ -41,7 +40,6 @@ namespace SignalRLab.SignalRTimer
 
         public void Stop()
         {
-            _userId = _httpContextAccessor.HttpContext.User.FindFirstValue("name");
             // 檢查是否存在計時器
             if (_userTimers.TryRemove(_userId, out var timer))
             {
@@ -60,6 +58,10 @@ namespace SignalRLab.SignalRTimer
                 var timer = _userTimers[_userId];
                 timer.Elapsed += (sender, args) => action();
                 timer.Start();
+            }
+            else
+            {
+                Restart();
             }
         }
 
