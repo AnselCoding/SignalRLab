@@ -1,8 +1,6 @@
 ﻿
 using Microsoft.AspNetCore.SignalR;
 using SignalRLab.Hubs;
-using System.Collections.Concurrent;
-using System.Security.Claims;
 
 namespace SignalRLab.SignalRTimer
 {
